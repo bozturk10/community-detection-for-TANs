@@ -1,0 +1,82 @@
+---
+title: "SBM community detection"
+output: html_notebook
+---
+
+
+
+```{r}
+rm(list=ls())
+library(plyr)
+library(dplyr)
+library(igraph)
+library(Matrix)
+library(tm)
+library(wordcloud)
+library(RColorBrewer)
+library(ggplot2)
+library(blockmodels)
+
+assign('graphs', get(load(file=r"(C:\Users\BERK\Desktop\Network\sqab037_codedataforsubmission\Code+data for submission 4 13 2021\Code+data for submission\result\graph_byyear.rda)" )) )
+
+assign('graphs_cum', get(load(file=r"(C:\Users\BERK\Desktop\Network\sqab037_codedataforsubmission\Code+data for submission 4 13 2021\Code+data for submission\result\graph_byyear_cumulative.rda)" )) )
+
+```
+
+
+
+```{r}
+print("Cumulative graphs by year")
+for(i in 1:(length(graph))){
+  g <- graphs_cum[[i]]
+  cat( 1993 + i,":", is_connected(g) ,ecount(g),vcount(g) ,"\n" )
+}
+
+```
+```{r}
+print("Cumulative graphs by year")
+e_counts_yearly = c()
+for(i in 1:(length(graph))){
+  g <- graphs[[i]]
+  cat(1993 + i,":", is_connected(g) ,ecount(g),vcount(g) ,"\n" )
+  append(e_counts_yearly,ecount(g))
+  }
+
+```
+```{r}
+G=graphs_cum[[24]]
+LO = layout_with_fr(G)
+plot(G, layout = LO,vertex.label=NA)
+
+```
+
+
+
+```{r}
+hist(degree(G),breaks = 200) 
+```
+
+```{r}
+G_adj=as.matrix(as_adjacency_matrix(G) )
+```
+
+
+
+```{r}
+
+gw=edge_attr(G)$weight
+hist(gw,breaks=35)
+
+```
+
+```{r}
+
+my_model <- BM_poisson("SBM",G_adj,explore_min=3 ,explore_max=13 )
+my_model$estimate()
+which.max(my_model$ICL)
+
+```
+
+
+
+
